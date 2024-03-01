@@ -75,3 +75,8 @@
         @apply bg-background text-foreground;
     }
 }
+
+.dragDropActive{
+    border: 2px solid black;
+    background-color: lightskyblue;
+}
