@@ -18,7 +18,7 @@ export const MergePdf=()=>{
 			<div className={"w-full flex flex-wrap gap-4"}>
 				{files.map((file, index) => {
 					return <DragDropElement key={index} setFiles={setFiles} index={index}>
-						<PdfPagePreview file={file}/>
+						<PdfPagePreview file={file} setFiles={setFiles}/>
 					</DragDropElement>
 				})}
 			</div> : <div className={"w-11/12 h-80 mx-auto"}>
