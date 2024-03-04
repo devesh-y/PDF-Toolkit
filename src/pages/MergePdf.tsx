@@ -22,8 +22,9 @@ export const MergePdf=()=>{
 					</DragDropElement>
 				})}
 			</div> : <div className={"w-11/12 h-80 mx-auto"}>
-			<UploadFiles getUploadedFiles={getUploadedFiles} fileType={"application/pdf"}/>
-		</div>}
+				<UploadFiles getUploadedFiles={getUploadedFiles} fileType={"application/pdf"}/>
+			</div>
+		}
 
 	</>
 }

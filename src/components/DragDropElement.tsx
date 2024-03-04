@@ -41,7 +41,7 @@ export const DragDropElement=memo(({setFiles,children,index}:{children:ReactNode
 	},[])
 
 
-	return <div id={index+" d&d"} draggable={true} onDragStart={dragStartFunc} onDragLeave={dragLeaveFunc} onDragEnter={dragEnterFunc} onDragOver={dragOverFunc} onDrop={dropFunc} className={"flex items-center justify-center w-40 h-40 bg-blue-700 rounded-xl transition-all"}>
+	return <div id={index+" d&d"} draggable={true} onDragStart={dragStartFunc} onDragLeave={dragLeaveFunc} onDragEnter={dragEnterFunc} onDragOver={dragOverFunc} onDrop={dropFunc} className={"w-48 h-56 rounded-xl transition-all border-2 hover:cursor-move"}>
 		{children}
 	</div>
 
