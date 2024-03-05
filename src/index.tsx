@@ -4,16 +4,21 @@ import './index.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {HomePage} from "@/pages/HomePage";
 import {MergePdf} from "@/pages/MergePdf";
+import {Toaster} from "@/components/ui/sonner";
 
 const root = ReactDOM.createRoot(
 	document.getElementById('root') as HTMLElement
 );
 root.render(
-	<BrowserRouter>
-		<Routes>
-			<Route path={"/"} element={<HomePage/>}/>
-			<Route path={"/mergePdf"} element={<MergePdf/>}/>
-		</Routes>
-	</BrowserRouter>
+	<>
+		<Toaster/>
+		<BrowserRouter>
+			<Routes>
+				<Route path={"/"} element={<HomePage/>}/>
+				<Route path={"/mergePdf"} element={<MergePdf/>}/>
+			</Routes>
+		</BrowserRouter>
+	</>
+
 
 );
