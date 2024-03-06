@@ -45,9 +45,9 @@ export const MergePdf=()=>{
 		{uploaded ?
 			<>
 				<Button  className={"flex justify-center mx-auto bg-blue-700 hover:bg-blue-600 my-2 w-40"} onClick={mergePdf}>{merging?<Loader2 className={"animate-spin"}/>:"Merge PDF"}</Button>
-				<ReactSortable list={items} setList={setItems} animation={200} delayOnTouchOnly={true} delay={2} className={"w-full flex flex-wrap gap-4 justify-center px-4"}>
+				<ReactSortable list={items} setList={setItems} animation={200} delayOnTouchOnly={true} delay={200} className={"w-full flex flex-wrap gap-4 justify-center px-4"}>
 					{items.map((item) => (
-						<div className={"w-48 h-56 rounded-xl border-2 hover:cursor-move"} key={item.id}>
+						<div className={"w-48 h-56 max-sm:w-24 max-sm:h-28 rounded-xl border-2 hover:cursor-move select-none"} key={item.id}>
 							<PdfPagePreview file={item.file} setItems={setItems}/>
 						</div>
 					))}

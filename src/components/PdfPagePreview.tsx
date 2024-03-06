@@ -76,12 +76,12 @@ export const PdfPagePreview=memo(({file,setItems}:{file:File,setItems: React.Dis
 	return <div className={"w-full h-full relative"}>
 		<XCircle strokeWidth={"1"} className={"absolute right-0 cursor-default fill-white hover:fill-red-600"} onClick={removeFile}/>
 		<RotateCw strokeWidth={"1.5"} className={`absolute cursor-default fill-white text-blue-700 ${rotating}`} onClick={rotatePdf}/>
-		<div className={"h-[90%] flex justify-center items-center p-2"}>
+		<div className={"h-[85%] flex justify-center items-center p-2"}>
 			<canvas ref={canvasRef} className={"rounded-xl w-full h-full"}></canvas>
 			{loading && <Loader2 className={"animate-spin absolute"}/>}
 		</div>
-		<div className={"h-[10%] flex items-center justify-center"}>
-			<p className={"line-clamp-1 text-center text-sm"} title={file.name}>{file.name}</p>
+		<div className={"h-[15%] flex items-center justify-center px-2"}>
+			<p className={"line-clamp-1 text-center max-sm:text-xs "} title={file.name}>{file.name}</p>
 		</div>
 	</div>
 
