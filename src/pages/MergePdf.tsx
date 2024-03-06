@@ -41,7 +41,7 @@ export const MergePdf=()=>{
 
 	},[items])
 	return <>
-		<ToolHeading title={"Merge PDF items"} content={"Combine PDFs in the order you want with the easiest PDF merger available."}/>
+		<ToolHeading title={"Merge PDF files"} content={"Combine PDFs in the order you want with the easiest PDF merger available."}/>
 		{uploaded ?
 			<>
 				<Button  className={"flex justify-center mx-auto bg-blue-700 hover:bg-blue-600 my-2 w-40"} onClick={mergePdf}>{merging?<Loader2 className={"animate-spin"}/>:"Merge PDF"}</Button>
