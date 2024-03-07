@@ -12,7 +12,7 @@ export const PdfFirstPagePreview=memo(({file,setItems}:{file:File,setItems: Reac
 		try{
 			const pdf=await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
 			const page=await pdf.getPage(1);
-			const viewport = page.getViewport({scale:1});
+			const viewport = page.getViewport({scale:0.3});
 
 			const canvas = canvasRef.current!;
 			const context = canvas.getContext('2d')!;
