@@ -1,7 +1,7 @@
 import {type ClassValue, clsx} from "clsx"
 import {twMerge} from "tailwind-merge"
 
-export type itemType={
+export type pdfItemType ={
 	id:number,
 	file:File
 }

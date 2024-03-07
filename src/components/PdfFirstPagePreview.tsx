@@ -2,9 +2,9 @@ import React, {memo, useCallback, useEffect, useRef, useState} from "react";
 import {pdfjsLib} from "../lib/pdfJs"
 import {Loader2, RotateCw, XCircle} from "lucide-react";
 import {degrees, PDFDocument} from "pdf-lib";
-import {itemType} from "@/lib/utils";
+import {pdfItemType} from "@/lib/utils";
 
-export const PdfPagePreview=memo(({file,setItems}:{file:File,setItems: React.Dispatch<React.SetStateAction<itemType[]>>})=>{
+export const PdfFirstPagePreview=memo(({file,setItems}:{file:File,setItems: React.Dispatch<React.SetStateAction<pdfItemType[]>>})=>{
 	const canvasRef=useRef<null|HTMLCanvasElement>(null)
 	const [loading,setLoading]=useState(true);
 	const [rotating,setRotating]=useState("")

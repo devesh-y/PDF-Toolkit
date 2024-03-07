@@ -2,13 +2,13 @@ import {UploadCloud} from "lucide-react"
 import {Button} from "@/components/ui/button";
 import React, {memo, useCallback, useRef} from "react";
 import {toast} from "sonner";
-export const UploadFiles=memo(({getUploadedFiles,fileType}:{getUploadedFiles: (e:File[]) => void,fileType:string})=>{
+export const UploadFiles=memo(({getUploadedFiles,fileType,multiple}:{getUploadedFiles: (e:File[]) => void,fileType:string,multiple:boolean})=>{
 	const inputFilesRef=useRef<HTMLInputElement|null>(null)
 
 	const checkFileFormat=useCallback((files:FileList)=>{
 		
 		const file=Array.from(files).find((file)=>{
-			return file.type!==fileType
+			return !(fileType.includes(file.type))
 		})
 		if(file){
 			toast("One of the files have invalid format", {
@@ -53,7 +53,7 @@ export const UploadFiles=memo(({getUploadedFiles,fileType}:{getUploadedFiles: (e
 			<UploadCloud  className={"w-fit h-full"} strokeWidth={1}/>
 		</div>
 		<div className={"py-3"}>
-			<input type={"file"} ref={inputFilesRef} accept={fileType} hidden={true} multiple={true}
+			<input type={"file"} ref={inputFilesRef} accept={fileType} hidden={true} multiple={multiple}
 				   onChange={browseFunc}/>
 			<Button variant={"default"} className={"bg-blue-600 w-32"}
 					onClick={() => inputFilesRef.current?.click()}>Browse</Button>
