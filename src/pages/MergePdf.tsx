@@ -8,11 +8,11 @@ export const MergePdf=()=>{
 	const [uploaded,setUploaded]=useState(false);
 	const [items,setItems]=useState<pdfItemType[]>([])
 	const getUploadedFiles=useCallback((files:File[])=>{
-		setUploaded(true);
 		let items:pdfItemType[]=[];
 		files.forEach((file,index)=>{
 			items.push({id:index+1,file});
 		})
+		setUploaded(true);
 		setItems(items);
 	},[])
 

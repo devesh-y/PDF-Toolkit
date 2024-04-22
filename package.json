@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@radix-ui/react-accordion": "^1.1.2",
+    "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@types/node": "^16.18.34",
     "@types/react": "^18.2.7",

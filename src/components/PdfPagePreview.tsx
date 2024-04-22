@@ -1,38 +1,17 @@
 import React, {memo, useCallback, useEffect, useRef, useState} from "react";
-import {pdfjsLib} from "../lib/pdfJs"
 import {Loader2, RotateCw, XCircle} from "lucide-react";
 import {degrees, PDFDocument} from "pdf-lib";
 import {pdfItemType} from "@/lib/utils";
+import {renderPdfPage} from "@/lib/renderPdf";
 
-export const PdfFirstPagePreview=memo(({file,setItems}:{file:File,setItems: React.Dispatch<React.SetStateAction<pdfItemType[]>>})=>{
+export const PdfPagePreview=memo(({file,setItems}:{file:File,setItems: React.Dispatch<React.SetStateAction<pdfItemType[]>>})=>{
 	const canvasRef=useRef<null|HTMLCanvasElement>(null)
 	const [loading,setLoading]=useState(true);
 	const [rotating,setRotating]=useState("")
-	const renderFirstPage = useCallback(async() => {
-		try{
-			const pdf=await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
-			const page=await pdf.getPage(1);
-			const viewport = page.getViewport({scale:0.3});
-
-			const canvas = canvasRef.current!;
-			const context = canvas.getContext('2d')!;
-
-			canvas.height = viewport.height;
-			canvas.width = viewport.width;
-			const renderContext = {
-				canvasContext: context,
-				viewport: viewport
-			};
-			await page.render(renderContext).promise;
-			setLoading(false);
-		}catch (e){
-			throw  new Error((e as Error).message);
-		}
-
-	}, [file])
+	
 	const removeFile=useCallback(()=>{
 		setItems((files)=>{
-				return files.filter((value)=>(value.file)!==file);
+			return files.filter((value)=>(value.file)!==file);
 		})
 	},[file, setItems])
 	const rotatePdf=useCallback(async ()=>{
@@ -69,10 +48,10 @@ export const PdfFirstPagePreview=memo(({file,setItems}:{file:File,setItems: Reac
 
 	},[file, setItems])
 	useEffect(() => {
-		renderFirstPage().catch((e)=>{
+		renderPdfPage(file,canvasRef).then(()=>setLoading(false)).catch((e)=>{
 			console.log(e)
 		});
-	}, [renderFirstPage]);
+	}, [file]);
 	return <div className={"w-full h-full relative"}>
 		<XCircle strokeWidth={"1"} className={"absolute right-0 cursor-default fill-white hover:fill-red-600"} onClick={removeFile}/>
 		<RotateCw strokeWidth={"1.5"} className={`absolute cursor-default fill-white text-blue-700 ${rotating}`} onClick={rotatePdf}/>

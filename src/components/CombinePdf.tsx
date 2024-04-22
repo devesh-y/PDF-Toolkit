@@ -5,7 +5,7 @@ import {downloadFile} from "@/lib/downloadFile";
 import {Button} from "@/components/ui/button";
 import {Loader2} from "lucide-react";
 import {ReactSortable} from "react-sortablejs";
-import {PdfFirstPagePreview} from "@/components/PdfFirstPagePreview";
+import {PdfPagePreview} from "@/components/PdfPagePreview";
 
 export const CombinePdf=memo(({files}:{files:pdfItemType[]})=>{
 	const [merging,setMerging]=useState(false);
@@ -34,7 +34,7 @@ export const CombinePdf=memo(({files}:{files:pdfItemType[]})=>{
 		<ReactSortable list={items} setList={setItems} animation={200} delayOnTouchOnly={true} delay={200} className={"w-full flex flex-wrap gap-4 justify-center px-4"}>
 			{items.map((item) => (
 				<div className={"w-48 h-56 max-sm:w-24 max-sm:h-28 rounded-xl border-2 hover:cursor-move select-none"} key={item.id}>
-					<PdfFirstPagePreview file={item.file} setItems={setItems}/>
+					<PdfPagePreview file={item.file} setItems={setItems}/>
 				</div>
 			))}
 		</ReactSortable>
