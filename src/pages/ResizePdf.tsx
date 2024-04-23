@@ -2,7 +2,7 @@ import {UploadFiles} from "@/components/UploadFiles";
 import React, {useCallback, useRef, useState} from "react";
 import {PDFDocument} from "pdf-lib";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
-import {Loader2} from "lucide-react";
+import {Loader2, MoveLeft, MoveRight} from "lucide-react";
 import {renderPdfPage} from "@/lib/renderPdf";
 
 export const ResizePdf=()=>{
@@ -94,15 +94,15 @@ export const ResizePdf=()=>{
 			const start=all?0:currentPage;
 			const end=all?pages.length:currentPage+1;
 
-			for(index = start; index<end; index++){} {
+			for(index = start; index<end; index++){
 				const page = pages[index];
 				const {width, height} = page.getSize();
 				if (height >= width) {
-
 					page.setWidth(height)
 					const marginWidth = height - width;
 					page.translateContent(marginWidth / 2, 0)
 				}
+
 			}
 			const buffer=await pdfDoc!.save();
 			const newDoc=await PDFDocument.load(buffer);
@@ -116,7 +116,21 @@ export const ResizePdf=()=>{
 
 		}
 	},[currentPage, pdfDoc])
+	const navigatePages=useCallback(async (value:number)=>{
+		const length=pdfDoc!.getPages().length;
+		if(value>=1&&value<=length){
+			setCurrentPage(value);
+			setLoading(true);
 
+			const buffer=await pdfDoc!.save();
+			const newFile=new File([buffer],"final",{type:"application/pdf"})
+			renderPdfPage(newFile,canvasRef,value).then(()=>{
+				setLoading(false);
+			})
+		}
+
+
+	},[pdfDoc])
 
 	return <>
 		{uploaded ? <>
@@ -125,6 +139,14 @@ export const ResizePdf=()=>{
 						{loading && <Loader2 className={" absolute animate-spin top-1/2 left-1/2"}/>}
 
 				</div>
+			<div className={"mx-auto w-fit flex justify-center gap-8 my-2 select-none"}>
+				<div onClick={()=>navigatePages(currentPage-1)}><MoveLeft/></div>
+				<input type={"number"} value={currentPage} className={"text-center"} onChange={(e)=>{
+					const num=Number(e.target.value);
+					navigatePages(num);
+				}}/>
+				<div onClick={()=>navigatePages(currentPage+1)}><MoveRight/></div>
+			</div>
 			
 				<Accordion type={"single"} collapsible={true}>
 					<AccordionItem value="item-1">
