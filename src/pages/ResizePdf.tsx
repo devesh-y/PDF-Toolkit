@@ -7,6 +7,8 @@ import {renderPdfPage} from "@/lib/renderPdf";
 import {toast} from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {downloadFile} from "@/lib/downloadFile";
 enum Direction{
 	Top,Right,Bottom,Left
 }
@@ -14,6 +16,7 @@ export const ResizePdf=()=>{
 	const [currentPage,setCurrentPage]=useState(1);
 	const [uploaded,setUploaded]=useState(false);
 	const [pdfDoc,setPdfDoc]=useState<PDFDocument|null>(null)
+	const [originalDoc,setOriginalDoc]=useState<PDFDocument|null>(null)
 	const [loading,setLoading]=useState(true);
 	const canvasRef=useRef<null|HTMLCanvasElement>(null)
 	const [marginValue,setMarginValue]=useState<number>(0);
@@ -29,16 +32,30 @@ export const ResizePdf=()=>{
 		const res=await fetch(url);
 		const arrayBuffer=await res.arrayBuffer()
 		const srcDoc=await PDFDocument.load(arrayBuffer)
+		const tempSrc=await PDFDocument.load(arrayBuffer)
+		setOriginalDoc(tempSrc);
 		setPdfDoc(srcDoc)
 	},[currentPage])
+	const resetFile=useCallback(async()=>{
+		if(originalDoc){
+			setLoading(true);
+			const buffer=await originalDoc.save();
+			const newDoc=await PDFDocument.load(buffer)
+			setPdfDoc(newDoc);
+			const newFile=new File([buffer],"file",{type:"application/pdf"})
+			renderPdfPage(newFile,canvasRef,currentPage).then(()=>{
+				setLoading(false);
+			})
+		}
 
+	},[currentPage, originalDoc])
 	const changeMargin=useCallback(async (direction:Direction)=>{
 		if(pdfDoc){
+			setLoading(true);
 			let index;
 			const pages=pdfDoc.getPages();
 			const start=isMultiple?0:currentPage-1;
 			const end=isMultiple?pages.length:currentPage;
-			setLoading(true);
 			for(index=start;index<end;index++){
 				const page=pages[index]
 				switch (direction){
@@ -78,12 +95,13 @@ export const ResizePdf=()=>{
 		
 	},[currentPage, isMultiple, marginValue, pdfDoc])
 
-	const convertToPortrait=useCallback(async(all=false)=>{
+	const convertToPortrait=useCallback(async()=>{
 		if(pdfDoc){
+			setLoading(true);
 			let index;
 			const pages=pdfDoc.getPages();
-			const start=all?0:currentPage-1;
-			const end=all?pages.length:currentPage;
+			const start=isMultiple?0:currentPage-1;
+			const end=isMultiple?pages.length:currentPage;
 
 			for(index=start;index<end;index++){
 				const page=pages[index]
@@ -107,21 +125,22 @@ export const ResizePdf=()=>{
 			const newDoc=await PDFDocument.load(buffer);
 			setPdfDoc(newDoc);
 			const newFile=new File([buffer],"final",{type:"application/pdf"})
-			setLoading(true);
+
 			renderPdfPage(newFile,canvasRef,currentPage).then(()=>{
 				setLoading(false);
 			})
 
 		}
 
-	},[currentPage, pdfDoc])
+	},[currentPage, isMultiple, pdfDoc])
 
-	const convertToLandscape=useCallback(async(all=false)=>{
+	const convertToLandscape=useCallback(async()=>{
 		if(pdfDoc){
+			setLoading(true);
 			let index;
 			const pages=pdfDoc.getPages();
-			const start=all?0:currentPage-1;
-			const end=all?pages.length:currentPage+1;
+			const start=isMultiple?0:currentPage-1;
+			const end=isMultiple?pages.length:currentPage+1;
 
 			for(index = start; index<end; index++){
 				const page = pages[index];
@@ -137,14 +156,14 @@ export const ResizePdf=()=>{
 			const newDoc=await PDFDocument.load(buffer);
 			const newFile=new File([buffer],"final",{type:"application/pdf"})
 			setPdfDoc(newDoc);
-			setLoading(true);
+
 			renderPdfPage(newFile,canvasRef,currentPage).then(()=>{
 				setLoading(false);
 			})
 
 
 		}
-	},[currentPage, pdfDoc])
+	},[currentPage, isMultiple, pdfDoc])
 	const navigatePages=useCallback(async (value:number)=>{
 		try {
 			const length=pdfDoc!.getPages().length;
@@ -172,32 +191,52 @@ export const ResizePdf=()=>{
 
 	return <>
 		{uploaded ? <>
-				<div className={" mx-auto w-11/12 h-72 max-sm:h-28  overflow-auto select-none relative "}>
+				<div className={" mx-auto w-11/12 h-96  overflow-auto select-none relative "}>
 					<canvas ref={canvasRef} className={"border-2 rounded-xl mx-auto"} ></canvas>
 						{loading && <Loader2 className={" absolute animate-spin top-1/2 left-1/2"}/>}
 
 				</div>
-			<div className={"mx-auto w-fit flex justify-center gap-8 my-2 select-none"}>
-				<div onClick={()=>navigatePages(currentPage-1)}><MoveLeft/></div>
-				<input type={"number"} value={currentPage} className={"text-center"} min={1} onChange={(e)=>{
-					const num=Number(e.target.value);
-					navigatePages(num).catch(()=>{
-						console.log("error rendering")
-					});
-				}}/>
-				<div onClick={()=>navigatePages(currentPage+1)}><MoveRight/></div>
+				<div className={"mx-auto w-fit flex justify-center gap-8 my-2 select-none"}>
+					<div onClick={()=>navigatePages(currentPage-1)}><MoveLeft/></div>
+					<input type={"number"} value={currentPage} className={"text-center"} min={1} onChange={(e)=>{
+						const num=Number(e.target.value);
+						navigatePages(num).catch(()=>{
+							console.log("error rendering")
+						});
+					}}/>
+					<div onClick={()=>navigatePages(currentPage+1)}><MoveRight/></div>
+				</div>
+			<div className={"mx-auto w-fit flex gap-2"}>
+				<Button onClick={async ()=>downloadFile(await pdfDoc!.save(),"application/pdf")}>Download</Button>
+				<Button variant={"destructive"} onClick={resetFile}>Reset</Button>
 			</div>
+
 			
 				<Accordion type={"single"} collapsible={true} className={"w-11/12 mx-auto"}>
 					<AccordionItem value="item-1">
 						<AccordionTrigger>PDF Page Resize</AccordionTrigger>
-						<AccordionContent>
-							<div className={"flex flex-wrap gap-2 text-white text-md select-none"}>
-								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"} onClick={()=>convertToPortrait()}>Portrait</div>
-								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"} onClick={()=>convertToPortrait(true)}>Portrait All</div>
-								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"} onClick={()=>convertToLandscape()}>Landscape</div>
-								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"} onClick={()=>convertToLandscape(true)}>Landscape All</div>
+						<AccordionContent className={"flex gap-2 flex-wrap"}>
 
+							<RadioGroup defaultValue="current" value={isMultiple ? "all" : "current"}
+										onValueChange={(value) => setIsMultiple("all" === value)}>
+								<div className="flex items-center space-x-2">
+									<RadioGroupItem value="current" id="r1"/>
+									<Label htmlFor="r1">Current</Label>
+								</div>
+								<div className="flex items-center space-x-2">
+									<RadioGroupItem value="all" id="r2"/>
+									<Label htmlFor="r2">All</Label>
+								</div>
+
+							</RadioGroup>
+							
+							<div className={"flex flex-wrap gap-2 text-white text-md select-none"}>
+								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"}
+									 onClick={() => convertToPortrait()}>Portrait
+								</div>
+								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"}
+									 onClick={() => convertToLandscape()}>Landscape
+								</div>
 							</div>
 						</AccordionContent>
 					</AccordionItem>
@@ -209,7 +248,8 @@ export const ResizePdf=()=>{
 									   className={"text-center m-2 p-2 border-2 rounded-2xl"} onChange={(e) => {
 									setMarginValue(Number(e.target.value))
 								}}/>
-								<RadioGroup defaultValue="current" value={isMultiple?"all":"current"} onValueChange={(value)=>setIsMultiple("all"===value)} >
+								<RadioGroup defaultValue="current" value={isMultiple ? "all" : "current"}
+											onValueChange={(value) => setIsMultiple("all" === value)}>
 									<div className="flex items-center space-x-2">
 										<RadioGroupItem  value="current" id="r1" />
 										<Label htmlFor="r1">Current</Label>

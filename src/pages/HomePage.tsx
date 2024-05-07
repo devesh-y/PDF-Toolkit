@@ -12,8 +12,7 @@ export const HomePage=()=>{
 		"pageName":"mergePdf"
 	},{
 		"title":"Organize PDF",
-		"content":"Sort, add and delete PDF pages.\n" +
-			"Drag and drop the page thumbnails and sort them in our PDF organizer.",
+		"content":"Sort, rotate, add and delete PDF pages.",
 		"pageName":"organizePdf"
 	},{
 		"title":"Resize PDF",
