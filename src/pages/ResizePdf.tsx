@@ -4,13 +4,20 @@ import {PDFDocument} from "pdf-lib";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {Loader2, MoveLeft, MoveRight} from "lucide-react";
 import {renderPdfPage} from "@/lib/renderPdf";
-
+import {toast} from "sonner";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+enum Direction{
+	Top,Right,Bottom,Left
+}
 export const ResizePdf=()=>{
 	const [currentPage,setCurrentPage]=useState(1);
 	const [uploaded,setUploaded]=useState(false);
 	const [pdfDoc,setPdfDoc]=useState<PDFDocument|null>(null)
 	const [loading,setLoading]=useState(true);
 	const canvasRef=useRef<null|HTMLCanvasElement>(null)
+	const [marginValue,setMarginValue]=useState<number>(0);
+	const [isMultiple,setIsMultiple]=useState<boolean>(false);
 	const getUploadedFiles=useCallback(async(files:File[])=>{
 		setUploaded(true);
 		const file=files[0];
@@ -25,56 +32,78 @@ export const ResizePdf=()=>{
 		setPdfDoc(srcDoc)
 	},[currentPage])
 
-	const changeMargin=useCallback(async ()=>{
+	const changeMargin=useCallback(async (direction:Direction)=>{
 		if(pdfDoc){
-			const srcDoc=pdfDoc
-			const increase=150;
-			const pages=srcDoc.getPages();
-			for(const page of pages){
-				const { width, height } = page.getSize();
-				const newWidth=width+increase*2;
-				const newHeight=height+increase*2;
-				page.setSize(newWidth,newHeight)
-				page.translateContent(increase, increase);
+			let index;
+			const pages=pdfDoc.getPages();
+			const start=isMultiple?0:currentPage-1;
+			const end=isMultiple?pages.length:currentPage;
+			setLoading(true);
+			for(index=start;index<end;index++){
+				const page=pages[index]
+				switch (direction){
+					case 0:{
+						page.translateContent(0, -marginValue);
+						break;
+					}
+					case 1:{
+						page.translateContent(-marginValue, 0);
+						break;
+					}
+					case 2:{
+						page.translateContent(0, marginValue);
+						break;
+					}
+					case 3:{
+						page.translateContent(marginValue, 0);
+						break;
+					}
+
+				}
+
 			}
-			const buffer=await srcDoc.save();
+			const buffer=await pdfDoc.save();
 			const newFile=new File([buffer],"final",{type:"application/pdf"})
 			const url=URL.createObjectURL(newFile);
 			const res=await fetch(url);
 			const arrayBuffer=await res.arrayBuffer()
 			const newDoc=await PDFDocument.load(arrayBuffer)
 			setPdfDoc(newDoc);
+
+			renderPdfPage(newFile,canvasRef,currentPage).then(()=>{
+				setLoading(false);
+			})
 		}
 
 		
-	},[pdfDoc])
+	},[currentPage, isMultiple, marginValue, pdfDoc])
 
 	const convertToPortrait=useCallback(async(all=false)=>{
 		if(pdfDoc){
 			let index;
-			const pages=pdfDoc!.getPages();
-			const start=all?0:currentPage;
-			const end=all?pages.length:currentPage+1;
+			const pages=pdfDoc.getPages();
+			const start=all?0:currentPage-1;
+			const end=all?pages.length:currentPage;
 
 			for(index=start;index<end;index++){
 				const page=pages[index]
-				const {width,height} = page.getSize();
+				const {width:w,height:h} = page.getSize();
 				//only if the page is in landscape
-				if(width>=height){
+				if(w>=h){
 					//making the height as twice of the landscape height
 					//to have a good vertical white space margin
-					page.setSize(height,height*1.5);
+					page.setSize(h,h*1.5);
 
-					const scale=height/width;
+					const scale=h/w;
 					page.scaleContent(scale,scale)
-					const contentHeight=scale*height;
-					const marginHeight=(height*1.5)-contentHeight;
+					const contentHeight=scale*h;
+					const marginHeight=(h*1.5)-contentHeight;
 					page.translateContent(0,marginHeight/2)
 				}
 			}
 
 
-			const buffer=await pdfDoc!.save();
+			const buffer=await pdfDoc.save();
 			const newDoc=await PDFDocument.load(buffer);
 			setPdfDoc(newDoc);
 			const newFile=new File([buffer],"final",{type:"application/pdf"})
@@ -90,16 +119,16 @@ export const ResizePdf=()=>{
 	const convertToLandscape=useCallback(async(all=false)=>{
 		if(pdfDoc){
 			let index;
-			const pages=pdfDoc!.getPages();
-			const start=all?0:currentPage;
+			const pages=pdfDoc.getPages();
+			const start=all?0:currentPage-1;
 			const end=all?pages.length:currentPage+1;
 
 			for(index = start; index<end; index++){
 				const page = pages[index];
-				const {width, height} = page.getSize();
-				if (height >= width) {
-					page.setWidth(height)
-					const marginWidth = height - width;
+				const {width:w, height:h} = page.getSize();
+				if (h >= w) {
+					page.setWidth(h)
+					const marginWidth = h - w;
 					page.translateContent(marginWidth / 2, 0)
 				}
 
@@ -117,18 +146,27 @@ export const ResizePdf=()=>{
 		}
 	},[currentPage, pdfDoc])
 	const navigatePages=useCallback(async (value:number)=>{
-		const length=pdfDoc!.getPages().length;
-		if(value>=1&&value<=length){
-			setCurrentPage(value);
-			setLoading(true);
+		try {
+			const length=pdfDoc!.getPages().length;
+			if(value>=1&&value<=length){
+				setCurrentPage(value);
+				setLoading(true);
 
-			const buffer=await pdfDoc!.save();
-			const newFile=new File([buffer],"final",{type:"application/pdf"})
-			renderPdfPage(newFile,canvasRef,value).then(()=>{
+				const buffer=await pdfDoc!.save();
+				const newFile=new File([buffer],"final",{type:"application/pdf"})
+				await renderPdfPage(newFile,canvasRef,value)
 				setLoading(false);
-			})
+			}
 		}
-
+		catch (e){
+			toast((e as Error).message, {
+				action: {
+					label: "Close",
+					onClick: () => console.log("Close"),
+				},
+			})
+			throw new Error((e as Error).message);
+		}
 
 	},[pdfDoc])
 
@@ -141,14 +179,16 @@ export const ResizePdf=()=>{
 				</div>
 			<div className={"mx-auto w-fit flex justify-center gap-8 my-2 select-none"}>
 				<div onClick={()=>navigatePages(currentPage-1)}><MoveLeft/></div>
-				<input type={"number"} value={currentPage} className={"text-center"} onChange={(e)=>{
+				<input type={"number"} value={currentPage} className={"text-center"} min={1} onChange={(e)=>{
 					const num=Number(e.target.value);
-					navigatePages(num);
+					navigatePages(num).catch(()=>{
+						console.log("error rendering")
+					});
 				}}/>
 				<div onClick={()=>navigatePages(currentPage+1)}><MoveRight/></div>
 			</div>
 			
-				<Accordion type={"single"} collapsible={true}>
+				<Accordion type={"single"} collapsible={true} className={"w-11/12 mx-auto"}>
 					<AccordionItem value="item-1">
 						<AccordionTrigger>PDF Page Resize</AccordionTrigger>
 						<AccordionContent>
@@ -162,19 +202,45 @@ export const ResizePdf=()=>{
 						</AccordionContent>
 					</AccordionItem>
 					<AccordionItem value="item-2">
-						<AccordionTrigger>Is it styled?</AccordionTrigger>
+						<AccordionTrigger>Margin</AccordionTrigger>
 						<AccordionContent>
-							Yes. It comes with default styles that matches the other
-							components&apos; aesthetic.
+							<div className={"flex items-center"}>
+								<input type={"number"} value={marginValue}
+									   className={"text-center m-2 p-2 border-2 rounded-2xl"} onChange={(e) => {
+									setMarginValue(Number(e.target.value))
+								}}/>
+								<RadioGroup defaultValue="current" value={isMultiple?"all":"current"} onValueChange={(value)=>setIsMultiple("all"===value)} >
+									<div className="flex items-center space-x-2">
+										<RadioGroupItem  value="current" id="r1" />
+										<Label htmlFor="r1">Current</Label>
+									</div>
+									<div className="flex items-center space-x-2">
+										<RadioGroupItem value="all" id="r2"/>
+										<Label htmlFor="r2">All</Label>
+									</div>
+
+								</RadioGroup>
+							</div>
+
+							<div className={"flex flex-wrap gap-2 text-white text-md select-none"}>
+								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"}
+									 onClick={() => changeMargin(Direction.Top)}>Top
+								</div>
+								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"}
+									 onClick={() => changeMargin(Direction.Right)}>Right
+								</div>
+								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"}
+									 onClick={() => changeMargin(Direction.Bottom)}>Bottom
+								</div>
+								<div className={"p-4 bg-blue-400 rounded-xl hover:bg-blue-600"}
+									 onClick={() => changeMargin(Direction.Left)}>Left
+								</div>
+
+							</div>
+
 						</AccordionContent>
 					</AccordionItem>
-					<AccordionItem value="item-3">
-						<AccordionTrigger>Is it animated?</AccordionTrigger>
-						<AccordionContent>
-							Yes. It&apos;s animated by default, but you can disable it if you
-							prefer.
-						</AccordionContent>
-					</AccordionItem>
+
 				</Accordion>
 			</>
 			: <div className={"w-11/12 h-80 mx-auto"}>
