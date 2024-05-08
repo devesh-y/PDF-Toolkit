@@ -8,11 +8,11 @@ export type toolType={
 export const HomePage=()=>{
 	const tools:toolType[]=[{
 		"title":"Merge PDF",
-		"content":"Combine PDFs in the order you want with the easiest PDF merger available.",
+		"content":"Drag and rotate PDFs in the order you want with the easiest PDF merger available.",
 		"pageName":"mergePdf"
 	},{
 		"title":"Organize PDF",
-		"content":"Sort, rotate, add and delete PDF pages.",
+		"content":"Sort, rotate, convert to image, insert images as pdf-page and remove pages.",
 		"pageName":"organizePdf"
 	},{
 		"title":"Resize PDF",
@@ -24,12 +24,12 @@ export const HomePage=()=>{
 		"pageName":"editPdf"
 	},{
 		"title":"PDF to Image",
-		"content":"Convert each PDF page into a image or extract all images contained in a PDF.",
-		"pageName":"pdfToImage"
+		"content":"Convert PDF page into a image.",
+		"pageName":"organizePdf"
 	},{
 		"title":"Image to PDF",
-		"content":"Convert images to PDF in seconds. Easily adjust orientation and margins.",
-		"pageName":"imageToPdf"
+		"content":"Convert images to PDF in seconds.",
+		"pageName":"organizePdf"
 	},{
 		"title":"Sign PDF",
 		"content":"Your tool to eSign documents. Sign a document yourself or send a signature request to others.",

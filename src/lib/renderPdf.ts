@@ -20,3 +20,13 @@ export const renderPdfPage = async(file:File, canvasRef: React.MutableRefObject<
 
 
 }
+export const downloadPdfPageAsImage=(canvasRef: React.MutableRefObject<HTMLCanvasElement | null>) => {
+        const canvas = canvasRef.current!;
+        const imageUrl=canvas.toDataURL("image/png",1);
+        const a =document.createElement('a');
+        a.href=imageUrl;
+        a.download="file";
+        a.click()
+
+
+}

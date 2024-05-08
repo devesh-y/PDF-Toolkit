@@ -68,8 +68,7 @@ export const OrganizePdf=()=>{
 		setItems(items);
 	},[])
 	return <>
-		<ToolHeading title={"Organize PDF"} content={"Sort, add and delete PDF pages.\n" +
-			"Drag and drop the page thumbnails and sort them in our PDF organizer."}/>
+		<ToolHeading title={"Organize PDF"} content={"Sort, rotate, convert to image, insert images as pdf-page and remove pages."}/>
 		{(uploaded && items.length>0) ? <CombinePdf files={items}/>
 			: <div className={"w-11/12 h-80 mx-auto flex items-center justify-center"}>
 				{(items.length===0 && uploaded) ?<Loader2 className={"animate-spin"}/>:<UploadFiles getUploadedFiles={getUploadedFiles} fileType={"application/pdf,image/png,image/jpeg,image/jpg,image/tiff,image/heic,image/svg+xml"} multiple={true}/>}

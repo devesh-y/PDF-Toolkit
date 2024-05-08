@@ -1,8 +1,8 @@
 import React, {memo, useCallback, useEffect, useRef, useState} from "react";
-import {Loader2, RotateCw, XCircle} from "lucide-react";
+import {Loader2, RotateCw, XCircle,Download} from "lucide-react";
 import {degrees, PDFDocument} from "pdf-lib";
 import {pdfItemType} from "@/lib/utils";
-import {renderPdfPage} from "@/lib/renderPdf";
+import {downloadPdfPageAsImage, renderPdfPage} from "@/lib/renderPdf";
 
 export const PdfPagePreview=memo(({file,setItems}:{file:File,setItems: React.Dispatch<React.SetStateAction<pdfItemType[]>>})=>{
 	const canvasRef=useRef<null|HTMLCanvasElement>(null)
@@ -14,6 +14,9 @@ export const PdfPagePreview=memo(({file,setItems}:{file:File,setItems: React.Dis
 			return files.filter((value)=>(value.file)!==file);
 		})
 	},[file, setItems])
+	const downloadAsImage=useCallback(()=>{
+		downloadPdfPageAsImage(canvasRef)
+	},[])
 	const rotatePdf=useCallback(async ()=>{
 		try {
 			setRotating("animate-spin")
@@ -53,8 +56,12 @@ export const PdfPagePreview=memo(({file,setItems}:{file:File,setItems: React.Dis
 		});
 	}, [file]);
 	return <div className={"w-full h-full relative"}>
-		<XCircle strokeWidth={"1"} className={"absolute right-0 cursor-default fill-white hover:fill-red-600"} onClick={removeFile}/>
-		<RotateCw strokeWidth={"1.5"} className={`absolute cursor-default fill-white text-blue-700 ${rotating}`} onClick={rotatePdf}/>
+		<div className={"absolute left-0 top-0 flex justify-between cursor-default w-full"}>
+			<RotateCw strokeWidth={"1.5"} className={` fill-white text-blue-700 ${rotating}`} onClick={rotatePdf}/>
+			<Download strokeWidth={"1.5"} className={` fill-white text-blue-700 `} onClick={downloadAsImage}/>
+			<XCircle strokeWidth={"1"} className={" fill-white hover:fill-red-600"} onClick={removeFile}/>
+		</div>
+
 		<div className={"h-[85%] flex justify-center items-center p-2"}>
 			<canvas ref={canvasRef} className={"rounded-xl w-full h-full"}></canvas>
 			{loading && <Loader2 className={"animate-spin absolute"}/>}

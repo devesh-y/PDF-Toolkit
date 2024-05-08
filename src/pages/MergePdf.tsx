@@ -17,7 +17,7 @@ export const MergePdf=()=>{
 	},[])
 
 	return <>
-		<ToolHeading title={"Merge PDF files"} content={"Drag PDFs in the order you want with the easiest PDF merger available."}/>
+		<ToolHeading title={"Merge PDF files"} content={"Drag and rotate PDFs in the order you want with the easiest PDF merger available."}/>
 		{uploaded ? <CombinePdf files={items}/>
 			: <div className={"w-11/12 h-80 mx-auto"}>
 				<UploadFiles getUploadedFiles={getUploadedFiles} fileType={"application/pdf"} multiple={true}/>
