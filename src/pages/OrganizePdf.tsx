@@ -60,12 +60,11 @@ export const OrganizePdf=()=>{
 				}
 
 			}
+			setItems(items);
 		}
 		catch(err){
 			console.log(err)
 		}
-
-		setItems(items);
 	},[])
 	return <>
 		<ToolHeading title={"Organize PDF"} content={"Sort, rotate, convert to image, insert images as pdf-page and remove pages."}/>

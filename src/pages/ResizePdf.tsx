@@ -140,7 +140,7 @@ export const ResizePdf=()=>{
 			let index;
 			const pages=pdfDoc.getPages();
 			const start=isMultiple?0:currentPage-1;
-			const end=isMultiple?pages.length:currentPage+1;
+			const end=isMultiple?pages.length:currentPage;
 
 			for(index = start; index<end; index++){
 				const page = pages[index];
