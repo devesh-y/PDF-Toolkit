@@ -3,6 +3,7 @@ import React, {useCallback, useState} from "react";
 import {ToolHeading} from "@/components/ToolHeading";
 import {pdfItemType} from "@/lib/utils";
 import {CombinePdf} from "@/components/CombinePdf";
+import {tools} from "@/pages/HomePage";
 
 export const MergePdf=()=>{
 	const [uploaded,setUploaded]=useState(false);
@@ -17,7 +18,7 @@ export const MergePdf=()=>{
 	},[])
 
 	return <>
-		<ToolHeading title={"Merge PDF files"} content={"Drag and rotate PDFs in the order you want with the easiest PDF merger available."}/>
+		<ToolHeading title={tools[0].title} content={tools[0].content}/>
 		{uploaded ? <CombinePdf files={items}/>
 			: <div className={"w-11/12 h-80 mx-auto"}>
 				<UploadFiles getUploadedFiles={getUploadedFiles} fileType={"application/pdf"} multiple={true}/>

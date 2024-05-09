@@ -9,6 +9,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {downloadFile} from "@/lib/downloadFile";
+import {tools} from "@/pages/HomePage";
+import {ToolHeading} from "@/components/ToolHeading";
 enum Direction{
 	Top,Right,Bottom,Left
 }
@@ -190,6 +192,7 @@ export const ResizePdf=()=>{
 	},[pdfDoc])
 
 	return <>
+		<ToolHeading title={tools[2].title} content={tools[2].content}/>
 		{uploaded ? <>
 				<div className={" mx-auto w-11/12 h-96  overflow-auto select-none relative "}>
 					<canvas ref={canvasRef} className={"border-2 rounded-xl mx-auto"} ></canvas>

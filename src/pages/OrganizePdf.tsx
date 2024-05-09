@@ -5,6 +5,7 @@ import {pdfItemType} from "@/lib/utils";
 import {CombinePdf} from "@/components/CombinePdf";
 import {PDFDocument} from "pdf-lib";
 import {Loader2} from "lucide-react";
+import {tools} from "@/pages/HomePage";
 
 export const OrganizePdf=()=>{
 	const [uploaded,setUploaded]=useState(false);
@@ -67,7 +68,7 @@ export const OrganizePdf=()=>{
 		}
 	},[])
 	return <>
-		<ToolHeading title={"Organize PDF"} content={"Sort, rotate, convert to image, insert images as pdf-page and remove pages."}/>
+		<ToolHeading title={tools[1].title} content={tools[1].content}/>
 		{(uploaded && items.length>0) ? <CombinePdf files={items}/>
 			: <div className={"w-11/12 h-80 mx-auto flex items-center justify-center"}>
 				{(items.length===0 && uploaded) ?<Loader2 className={"animate-spin"}/>:<UploadFiles getUploadedFiles={getUploadedFiles} fileType={"application/pdf,image/png,image/jpeg,image/jpg,image/tiff,image/heic,image/svg+xml"} multiple={true}/>}
